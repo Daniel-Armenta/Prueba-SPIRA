@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <title>Prueba - Rifa</title>
+    <meta charset="UTF-8">
+    <meta name="title" content="Prueba - Rifa">
+    <meta name="description" content="Simulación de Rifa">
+    <link rel="stylesheet" href="css/extra.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <div id="cuadro-inicio">
+      <img src="img/icon1.png" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:130px; position: absolute; top: 6%; left: 3%;">
+      <section class="centro">
+        <div class="w3-container">
+          <div class="w3-card-4" style="width:150%;">
+            <header class="w3-container w3-light-grey">
+              <h3>Simulador de Sorteos</h3>
+            </header>
+            <div class="w3-container text-white">
+              <p>A continuación ingrese el total de participantes</p>
+              <hr>
+                <img src="img/icon2.png" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:60px">
+                <span> Participantes: <input type="text" id="total_Rondas" style="background-color: transparent; text-align: center;;" class="text-white" name="total_Rondas" onKeyPress="return soloNumeros(event);"></span><br><br>
+                <span><input type="radio" name="dif-10" id="igu-10" value="1" onchange="diferente10(this.value)" checked> 10 Participantes</span>
+                <span> / <input type="radio" name="dif-10" id="dif-10" value="0" onchange="diferente10(this.value)"> Otro Valor</span><br>
+            </div>
+            <br>
+            <button onclick="iniciar();" class="w3-button w3-block w3-dark-grey" style="border-radius: 0px 0px 35px 35px;">> COMENZAR <</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="cuadro-juego">
+      <section style="position: absolute; top: 15%; left: 30%;">
+        <img id="anim1" src="img/firework1.gif" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:300px; position: absolute; top: 38%; left: 3%;">
+        <img id="anim2" src="img/firework1.gif" alt="Avatar" class="w3-left w3-circle w3-margin-right" style="width:300px; position: absolute; top: 38%; left: 115%;">
+        <div class="w3-container">
+          <div class="w3-card-4" style="width:180%;">
+            <header class="w3-container w3-light-grey">
+              <h3 class="center" id="text-sup">Generador de Números</h3>
+            </header>
+            <div class="w3-container text-white" >
+              <p id="text-des"></p>
+              <hr>
+              <div class="img-contenedor">
+                <img src="img/ticket.png" class="center" style="width:300px">
+                <div class="centrado" style="color:#e30613"><span style="font-size:5em" id="random">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section id="generar" style="position: absolute; top: 6%; left: 1%; width: 20%;">
+      <div class="w3-container">
+        <div class="w3-card-4" style="width:130%">
+          <header>
+            <button class="w3-button w3-block w3-dark-grey" style="border-radius: 35px 35px 0px 0px;" id="btn-generar" onclick="generar();">> GENERAR <</button>
+          </header>
+          <div class="w3-container text-white" >
+            <p class="text-white">Intentos</p>
+            <hr>
+          </div>
+          <div class="w3-container text-white Scroll" >
+            <div >
+              <div >
+                <table id="tab_usados">
+                </table>
+              </div>
+            </div>
+          </div>
+          <button onclick="reiniciar();" class="w3-button w3-block w3-dark-grey" style="border-radius: 0px 0px 35px 35px;" id="btn-reiniciar"> - REINICIAR -</button>
+        </div>
+      </div>
+    </section> <br><br>
+
+
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script href="js/jquery-3.4.1.min.js"></script>
+    <script>
+      var total = 0, val_actual = 0, num_utilizados, limit = 0;
+      var cuadroInico = document.getElementById('cuadro-inicio');
+      var b = '', button=0;
+
+      $(document).ready(function() {
+        $('#btn-reiniciar').hide();
+        //$('#cuadro-inicio').hide();
+        $('#generar').hide();
+        $('#cuadro-juego').hide();
+        document.getElementById("total_Rondas").disabled = true;
+        $(total_Rondas).val('10');
+      });
+
+      function soloNumeros(e){
+        var key = window.Event ? e.which : e.keyCode
+            return (key >= 48 && key <= 57)
+      }
+
+      function reiniciar(){
+        document.getElementById("igu-10").checked = true;
+        $("#generar").fadeOut(1500);
+        $("#cuadro-juego").fadeOut(1500);
+        setTimeout(function() {
+            $('#cuadro-inicio').fadeIn(1500);
+        },1000);
+        $('#total_Rondas').val('');
+        $('#tab_usados').html('');
+        $('#random').html('0');
+        document.getElementById("total_Rondas").disabled = true;
+        $(total_Rondas).val('10');
+        limit = 0;
+        button=0;
+      }
+
+      function iniciar(){
+        iniciarItems();
+        //
+        total = $('#total_Rondas').val();
+        if (total>0){
+          num_utilizados = new Array(total);
+          $('#cuadro-inicio').fadeOut(1500);
+          setTimeout(function() {
+              $("#generar").fadeIn(1500);
+              $("#cuadro-juego").fadeIn(1500);
+          },1000);
+          //console.log(total);
+        } else {
+          alert("Ingrese un Número");
+        }
+      }
+
+      function aleatorio(){
+          var x = Math.round(Math.random() * (total - 1) + 1);
+          $("#random").html(x);
+      }
+
+      function generar(){
+        if(button==0){
+          button++;
+          b = setInterval(aleatorio,80);
+          setTimeout(function() {
+            clearInterval(b);
+            if (total>limit){
+              do{
+                val_actual  = Math.round(Math.random() * (total - 1) + 1);
+                num_utilizados[limit]=val_actual;
+              }while(buscarNumero(val_actual));
+              $("#random").html(val_actual);
+              limit++;
+              //
+              $("#tab_usados").html("");
+              for(var i=0; i<limit; i++){
+                var tr = `<tr>
+                  <td> #`+(i+1)+`</td>
+                  <td> Participante #`+num_utilizados[i]+`</td>
+                </tr>`;
+                $("#tab_usados").append(tr)
+              }
+              button--;
+              if (total==limit){
+                $("#random").html(val_actual);
+                button--;
+                finalizar();
+                alert("¡¡Tenemos Un Ganador!!");
+              }
+            } else {
+              alert("Se han generado todos los números");
+            }
+          },1000);
+        }
+      }
+
+      function finalizar(){
+        $('#btn-generar').hide();
+        $('#btn-reiniciar').show();
+        $('#anim1').show();
+        $('#anim2').show();
+        $('#text-sup').html('<h3 class="center" id="text-sup">Ganador</h3>');
+        $('#text-des').html('<b>Sorteo finalizado</b>, tenemos ganador. -Gracias por participar-');
+      }
+
+      function iniciarItems(){
+        $('#btn-generar').show();
+        $('#btn-reiniciar').hide();
+        $('#anim1').hide();
+        $('#anim2').hide();
+        $('#text-sup').html('<h3 class="center" id="text-sup">Generador de Números</h3>');
+        $('#text-des').html('Da click en el botón <b>GENERAR</b> para obtenr un nuevo número');
+      }
+
+      function diferente10(x){
+        if(x==1){
+          document.getElementById("total_Rondas").disabled = true;
+          $(total_Rondas).val('10');
+        } else {
+          document.getElementById("total_Rondas").disabled = false;
+          $(total_Rondas).val('');
+        }
+      }
+
+      function buscarNumero(x){
+        var ban = 0;
+        for(var i=0; i<limit; i++){
+          if (num_utilizados[i]==x){
+            ban = 1;
+          }
+        }
+        return ban;
+      }
+    </script>
+  </body>
+</html>
